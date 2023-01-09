@@ -1,4 +1,4 @@
-import Post from "../../models/Posts";
+import Post from '../../models/Posts';
 
 export const postsResolvers = {
   Query: {

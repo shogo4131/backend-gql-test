@@ -1,17 +1,17 @@
-import { ApolloServer } from "apollo-server";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
-import { typeDefs } from "./graphql/typeDefs";
-import { resolvers } from "./graphql/resolvers";
+import { ApolloServer } from 'apollo-server';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import { typeDefs } from './graphql/typeDefs';
+import { resolvers } from './graphql/resolvers';
 
 dotenv.config();
 
 const server = new ApolloServer({ typeDefs, resolvers });
 
 mongoose
-  .connect(process.env.DB_CONNECT || "")
+  .connect(process.env.DB_CONNECT || '')
   .then(() => {
-    console.log("server connected");
+    console.log('server connected');
     return server.listen({ port: 3030 });
   })
   .then((res) => {

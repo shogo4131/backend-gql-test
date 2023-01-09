@@ -1,12 +1,9 @@
-import { UserInputError } from "apollo-server";
-import * as bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import { UserInputError } from 'apollo-server';
+import * as bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
-import User, { type UserDoc } from "../../models/User";
-import {
-  vaidationRegisterInput,
-  validationLoginInput,
-} from "../../utils/validatitons";
+import User, { type UserDoc } from '../../models/User';
+import { vaidationRegisterInput, validationLoginInput } from '../../utils/validatitons';
 
 export const userResolvers = {
   Mutation: {
@@ -33,14 +30,14 @@ export const userResolvers = {
         confirmPassword
       );
 
-      if (!isError) throw new UserInputError("errors", { errors });
+      if (!isError) throw new UserInputError('errors', { errors });
 
       const user = await User.findOne({ username });
 
       // NOTE: 同じユーザー名の場合
       if (user) {
-        throw new UserInputError("username is taken", {
-          errors: { username: "this username is taken" },
+        throw new UserInputError('username is taken', {
+          errors: { username: 'this username is taken' },
         });
       }
 
@@ -62,31 +59,25 @@ export const userResolvers = {
     /**
      * ログイン
      */
-    async login(
-      _: any,
-      { username, password }: { username: string; password: string }
-    ) {
+    async login(_: any, { username, password }: { username: string; password: string }) {
       const { errors, isError } = validationLoginInput(username, password);
 
       if (!isError) {
-        throw new UserInputError("wrong credatials。", { errors });
+        throw new UserInputError('wrong credatials。', { errors });
       }
 
       const user = await User.findOne({ username });
 
       if (!user) {
-        errors.general = "ユーザー情報が見つかりません。";
-        throw new UserInputError("user not found", { errors });
+        errors.general = 'ユーザー情報が見つかりません。';
+        throw new UserInputError('user not found', { errors });
       }
 
-      const passwordMatch = await bcrypt.compare(
-        password,
-        user.password.toString()
-      );
+      const passwordMatch = await bcrypt.compare(password, user.password.toString());
 
       if (!passwordMatch) {
-        errors.general = "パスワードが一致しません。";
-        throw new UserInputError("password not match", { errors });
+        errors.general = 'パスワードが一致しません。';
+        throw new UserInputError('password not match', { errors });
       }
 
       const token = createToken(user);
@@ -111,7 +102,7 @@ const createToken = (user: any) => {
       email: user.email,
       username: user.username,
     },
-    process.env.SERCRET_KEY || "",
-    { expiresIn: "1h" }
+    process.env.SERCRET_KEY || '',
+    { expiresIn: '1h' }
   );
 };

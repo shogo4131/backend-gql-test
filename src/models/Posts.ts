@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import { model, Schema } from 'mongoose';
 
 interface PostsDoc {
   body: string;
@@ -22,10 +22,10 @@ const postsSchema = new Schema(
     likes: [{ name: String, createdAt: String }],
     user: {
       type: Schema.Types.ObjectId,
-      ref: "users",
+      ref: 'users',
     },
   },
   { timestamps: true }
 );
 
-export default model<PostsDoc>("Posts", postsSchema);
+export default model<PostsDoc>('Posts', postsSchema);
