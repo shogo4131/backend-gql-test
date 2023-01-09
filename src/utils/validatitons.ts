@@ -44,5 +44,26 @@ export const vaidationRegisterInput = (
     !errors.password &&
     !errors.confirmPassword;
 
-  return { errors, valid: isError };
+  return { errors, isError };
+};
+
+/**
+ * ログインバリデーション
+ * @param username
+ * @param password
+ */
+export const validationLoginInput = (username: string, password: string) => {
+  const errors = { username: "", password: "", general: "" };
+
+  if (username.trim() === "") {
+    errors.username = "ユーザーネームを入力してください。";
+  }
+
+  if (password.trim() === "") {
+    errors.password = "パスワードを入力してください。";
+  }
+
+  const isError = !errors.username && !errors.password;
+
+  return { errors, isError };
 };
