@@ -3,27 +3,37 @@ import * as bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import User, { type UserDoc } from "../../models/User";
-import { vaidationRegisterInput } from "../../utils/validatitons";
+import {
+  vaidationRegisterInput,
+  validationLoginInput,
+} from "../../utils/validatitons";
 
-type UserRequest = {
-  confirmPassword: string;
-} & UserDoc;
-
-// TODO: anyをなんとかする
 export const userResolvers = {
   Mutation: {
+    /**
+     * 新規登録
+     */
     async register(
       _: any,
-      { registerInput: { username, email, password, confirmPassword } }: any
+      {
+        registerInput: { username, email, password, confirmPassword },
+      }: {
+        registerInput: {
+          username: string;
+          email: string;
+          password: string;
+          confirmPassword: string;
+        };
+      }
     ) {
-      const { errors, valid } = vaidationRegisterInput(
+      const { errors, isError } = vaidationRegisterInput(
         username,
         email,
         password,
         confirmPassword
       );
 
-      if (!valid) throw new UserInputError("errors", { errors });
+      if (!isError) throw new UserInputError("errors", { errors });
 
       const user = await User.findOne({ username });
 
@@ -44,17 +54,64 @@ export const userResolvers = {
 
       const res = await newUser.save();
 
-      const token = jwt.sign(
-        {
-          id: res.id,
-          email: res.email,
-          username: res.username,
-        },
-        process.env.SERCRET_KEY || "",
-        { expiresIn: "1h" }
-      );
+      const token = createToken(res);
 
       return { ...res._doc, id: res._id, token };
     },
+
+    /**
+     * ログイン
+     */
+    async login(
+      _: any,
+      { username, password }: { username: string; password: string }
+    ) {
+      const { errors, isError } = validationLoginInput(username, password);
+
+      if (!isError) {
+        throw new UserInputError("wrong credatials。", { errors });
+      }
+
+      const user = await User.findOne({ username });
+
+      if (!user) {
+        errors.general = "ユーザー情報が見つかりません。";
+        throw new UserInputError("user not found", { errors });
+      }
+
+      const passwordMatch = await bcrypt.compare(
+        password,
+        user.password.toString()
+      );
+
+      if (!passwordMatch) {
+        errors.general = "パスワードが一致しません。";
+        throw new UserInputError("password not match", { errors });
+      }
+
+      const token = createToken(user);
+
+      return {
+        ...user._doc,
+        id: user._id,
+        token,
+      };
+    },
   },
+};
+
+/**
+ * token生成処理
+ */
+// TODO: anyを消す
+const createToken = (user: any) => {
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+    },
+    process.env.SERCRET_KEY || "",
+    { expiresIn: "1h" }
+  );
 };
