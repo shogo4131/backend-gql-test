@@ -9,7 +9,7 @@ type UserRequest = {
 
 export const userResolvers = {
   Mutation: {
-    async regiser(
+    async register(
       _: any,
       { registerInput: { username, email, password, confirmPassword } }: any
     ) {
