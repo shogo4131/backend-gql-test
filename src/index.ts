@@ -6,7 +6,7 @@ import { resolvers } from './graphql/resolvers';
 
 dotenv.config();
 
-const server = new ApolloServer({ typeDefs, resolvers });
+const server = new ApolloServer({ typeDefs, resolvers, context: ({ req }) => ({ req }) });
 
 mongoose
   .connect(process.env.DB_CONNECT || '')
