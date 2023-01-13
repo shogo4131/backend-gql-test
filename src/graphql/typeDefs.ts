@@ -25,7 +25,6 @@ export const typeDefs = gql`
   type Query {
     getPosts: [Post]
     getPost(postId: ID!): Post
-    getUsers: [Users]
   }
 
   type Mutation {
