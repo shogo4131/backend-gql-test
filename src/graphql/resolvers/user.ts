@@ -2,7 +2,7 @@ import { UserInputError } from 'apollo-server';
 import * as bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import User, { type UserDoc } from '../../models/User';
+import User from '../../models/User';
 import { vaidationRegisterInput, validationLoginInput } from '../../utils/validatitons';
 
 export const userResolvers = {
@@ -99,8 +99,6 @@ const createToken = (user: any) => {
   return jwt.sign(
     {
       id: user.id,
-      email: user.email,
-      username: user.username,
     },
     process.env.SERCRET_KEY || '',
     { expiresIn: '1h' }
