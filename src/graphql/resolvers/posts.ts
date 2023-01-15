@@ -1,4 +1,4 @@
-import { AuthenticationError } from 'apollo-server';
+import { AuthenticationError, UserInputError } from 'apollo-server';
 import User from '../../models/User';
 import Post from '../../models/Posts';
 import { authCheck } from '../../utils/auth-check';
@@ -73,6 +73,34 @@ export const postsResolvers = {
         console.error(error);
         throw new Error('投稿の削除に失敗しました。');
       }
+    },
+
+    /**
+     * いいね
+     */
+    async likePost(_: any, { postId }: { postId: string }, context: any) {
+      const user = authCheck(context);
+
+      // TODO: Promise ALL使う
+      const post = await Post.findById(postId);
+      const selectedUser = await User.findById(user.id);
+
+      if (!post) throw new UserInputError('投稿が見つかりませんでした。');
+      if (!selectedUser?.username) throw new Error('該当するユーザーは見つかりませんでした。');
+
+      const isLikeUser = post.likes.find((like) => like.username === selectedUser.username);
+
+      if (isLikeUser) {
+        post.likes = post.likes.filter((like) => like.username !== selectedUser.username);
+      } else {
+        post.likes.push({
+          username: selectedUser.username,
+        });
+      }
+
+      await post.save();
+
+      return post;
     },
   },
 };
