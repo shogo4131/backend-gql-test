@@ -1,16 +1,19 @@
 import { model, Schema } from 'mongoose';
 
-interface PostsDoc {
+export interface PostsDoc {
   body: string;
   username: string;
   comments: Commnet[];
-  likes: string[];
+  likes: Like[];
 }
 
 interface Commnet {
+  id?: string;
   body: string;
   username: string;
 }
+
+interface Like extends Omit<Commnet, 'body'> {}
 
 const commentsSchama = new Schema(
   {
@@ -23,7 +26,6 @@ const commentsSchama = new Schema(
 const likesSchema = new Schema(
   {
     username: { type: String },
-    createdAt: { type: String },
   },
   { timestamps: true }
 );
