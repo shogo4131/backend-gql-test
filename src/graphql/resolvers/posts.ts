@@ -8,7 +8,9 @@ export const postsResolvers = {
     /**
      * 投稿一覧
      */
-    async getPosts() {
+    async getPosts(_: any, __: any, context: any) {
+      authCheck(context);
+
       try {
         const posts = await Post.find().sort({ createdAt: -1 });
         return posts;
@@ -19,7 +21,9 @@ export const postsResolvers = {
     /**
      * 投稿
      */
-    async getPost(_: any, { postId }: { postId: string }) {
+    async getPost(_: any, { postId }: { postId: string }, __: any, context: any) {
+      authCheck(context);
+
       try {
         const post = await Post.findById(postId);
 
